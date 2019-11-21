@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SpaceX Launches</string>
+    <string name="launches_list_tab_title">Launches</string>
+    <string name="launches_chart_tab_title">Statistics</string>
 </resources>
