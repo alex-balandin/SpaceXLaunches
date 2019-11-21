@@ -20,31 +20,36 @@ class MainViewModel @Inject constructor(
     private val logTag = "MainViewModel"
 
     private val launchesLiveData: MutableLiveData<List<Launch>> = MutableLiveData()
-    private val lastUpdateTimestamp: MutableLiveData<Long> = MutableLiveData()
-    private val progressBarLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    private val lastUpdateTimeData: MutableLiveData<Long> = MutableLiveData()
+    private val progressVisibilityData: MutableLiveData<Boolean> = MutableLiveData()
 
     fun getLaunchesLiveData(): MutableLiveData<List<Launch>> = launchesLiveData
 
-    fun onLaunchesListViewCreated() = getLaunchesData(false)
+    fun getLastUpdateTimeData(): MutableLiveData<Long> = lastUpdateTimeData
 
-    fun getLastUpdateTimestamp(): MutableLiveData<Long> = lastUpdateTimestamp
+    fun getProgressVisibilityData(): MutableLiveData<Boolean> = progressVisibilityData
+
+    fun onLaunchesListViewCreated() = getLaunchesData(false)
 
     fun refreshLaunchesData() = getLaunchesData(true)
 
     @SuppressLint("CheckResult")
     private fun getLaunchesData(forceUpdate: Boolean) {
         Log.d(logTag, "getLaunchesData(), forceUpdate=${forceUpdate}")
+        progressVisibilityData.value = true
         repository.getAllLaunches(forceUpdate)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
                     Log.d(logTag, "getAllLaunches success")
+                    progressVisibilityData.value = false
                     launchesLiveData.value = it
-                    lastUpdateTimestamp.value = repository.getLaunchesUpdateTimestamp()
+                    lastUpdateTimeData.value = repository.getLaunchesUpdateTimestamp()
                 },
                 onError = {
                     Log.e(logTag, "getAllLaunches error:${it}")
+                    progressVisibilityData.value = false
                 })
     }
 

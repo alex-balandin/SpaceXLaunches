@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.test.spacexlaunches.R
 import com.test.spacexlaunches.SpaceXLaunchesApp
 import com.test.spacexlaunches.ui.main.MainViewModel
@@ -22,6 +24,9 @@ class LaunchesListFragment : Fragment() {
     @Inject
     lateinit var mainViewModelFactory: MainViewModelFactory
     lateinit var viewModel: MainViewModel
+
+    lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    lateinit var progressBar: View
 
     lateinit var testView: TextView
     lateinit var lastUpdateTimeView: TextView
@@ -46,9 +51,19 @@ class LaunchesListFragment : Fragment() {
 
         testView = view.findViewById(R.id.test_view)
         lastUpdateTimeView = view.findViewById(R.id.last_update_time_text)
+        lastUpdateTimeView.text = getString(R.string.launches_last_update_time_label, "")
 
         observeData()
         viewModel.onLaunchesListViewCreated()
+
+        progressBar = view.findViewById(R.id.progress)
+
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent)
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = true
+            viewModel.refreshLaunchesData()
+        }
     }
 
     private fun observeData() {
@@ -56,7 +71,16 @@ class LaunchesListFragment : Fragment() {
             testView.text = it.toString()
         })
 
-        viewModel.getLastUpdateTimestamp().observe(this, Observer {
+        viewModel.getProgressVisibilityData().observe(this, Observer { isProgress ->
+            if (isProgress && !swipeRefreshLayout.isRefreshing) {
+                progressBar.visibility = View.VISIBLE
+            } else if (!isProgress) {
+                progressBar.visibility = View.GONE
+                swipeRefreshLayout.isRefreshing = false
+            }
+        })
+
+        viewModel.getLastUpdateTimeData().observe(this, Observer {
             val lastUpdateStr = getString(R.string.launches_last_update_time_label, it.toString())
             lastUpdateTimeView.text = lastUpdateStr
         })
