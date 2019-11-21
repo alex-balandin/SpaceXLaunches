@@ -50,8 +50,8 @@ class ChartFragment : Fragment() {
     }
 
     private fun observeData() {
-        viewModel.getTestLiveData().observe(this, Observer {
-            testView.text = it
+        viewModel.getLaunchesLiveData().observe(this, Observer {
+            testView.text = it.toString()
         })
     }
 }

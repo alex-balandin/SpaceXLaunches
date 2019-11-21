@@ -24,6 +24,7 @@ class LaunchesListFragment : Fragment() {
     lateinit var viewModel: MainViewModel
 
     lateinit var testView: TextView
+    lateinit var lastUpdateTimeView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,14 +45,20 @@ class LaunchesListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         testView = view.findViewById(R.id.test_view)
+        lastUpdateTimeView = view.findViewById(R.id.last_update_time_text)
 
         observeData()
         viewModel.onLaunchesListViewCreated()
     }
 
     private fun observeData() {
-        viewModel.getTestLiveData().observe(this, Observer {
-            testView.text = it
+        viewModel.getLaunchesLiveData().observe(this, Observer {
+            testView.text = it.toString()
+        })
+
+        viewModel.getLastUpdateTimestamp().observe(this, Observer {
+            val lastUpdateStr = getString(R.string.launches_last_update_time_label, it.toString())
+            lastUpdateTimeView.text = lastUpdateStr
         })
     }
 }

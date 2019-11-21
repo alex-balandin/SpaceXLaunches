@@ -2,4 +2,6 @@
     <string name="app_name">SpaceX Launches</string>
     <string name="launches_list_tab_title">Launches</string>
     <string name="launches_chart_tab_title">Statistics</string>
+    <string name="launches_last_update_time_label">Last update: %s</string>
+    <string name="launches_swipe_down_to_refresh">Swipe down to refresh data</string>
 </resources>
