@@ -11,11 +11,11 @@ data class RawLaunch(
     @SerializedName("mission_id")
     val missionId: List<Any?>? = null,
     @SerializedName("upcoming")
-    val upcoming: Boolean? = null,
+    val upcoming: Boolean,
     @SerializedName("launch_year")
     val launchYear: String? = null,
     @SerializedName("launch_date_unix")
-    val launchDateUnix: Int? = null,
+    val launchDateUnix: Long? = null,
     @SerializedName("launch_date_utc")
     val launchDateUtc: String? = null,
     @SerializedName("launch_date_local")

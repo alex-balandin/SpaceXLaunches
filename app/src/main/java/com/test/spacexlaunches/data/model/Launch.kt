@@ -23,10 +23,10 @@ data class Launch(
     val missionName: String? = null,
 
     @ColumnInfo(name = "upcoming")
-    val upcoming: Boolean? = null,
+    val upcoming: Boolean,
 
     @ColumnInfo(name = "launchDateUnix")
-    val launchDateUnix: Int? = null,
+    val launchDateUnix: Long? = null,
 
     @ColumnInfo(name = "rocketName")
     val rocketName: String? = null,

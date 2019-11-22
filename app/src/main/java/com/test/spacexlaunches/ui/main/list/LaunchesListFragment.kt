@@ -6,20 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.test.spacexlaunches.R
 import com.test.spacexlaunches.SpaceXLaunchesApp
 import com.test.spacexlaunches.ui.main.MainViewModel
 import com.test.spacexlaunches.ui.main.MainViewModelFactory
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 /**
  * Created by alex-balandin on 2019-11-21
  */
 class LaunchesListFragment : Fragment() {
+
+    private val lastUpdateDateFormat: SimpleDateFormat
+            = SimpleDateFormat("dd/MM/yyyy hh:mm:ss", Locale.ENGLISH)
 
     @Inject
     lateinit var mainViewModelFactory: MainViewModelFactory
@@ -28,7 +36,9 @@ class LaunchesListFragment : Fragment() {
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
     lateinit var progressBar: View
 
-    lateinit var testView: TextView
+    lateinit var recyclerView: RecyclerView
+    lateinit var launchesListAdapter: LaunchesListAdapter
+
     lateinit var lastUpdateTimeView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +59,6 @@ class LaunchesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        testView = view.findViewById(R.id.test_view)
         lastUpdateTimeView = view.findViewById(R.id.last_update_time_text)
         lastUpdateTimeView.text = getString(R.string.launches_last_update_time_label, "")
 
@@ -64,11 +73,22 @@ class LaunchesListFragment : Fragment() {
             swipeRefreshLayout.isRefreshing = true
             viewModel.refreshLaunchesData()
         }
+
+        recyclerView = view.findViewById(R.id.launches_recycler_view)
+        recyclerView.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+
+        launchesListAdapter = LaunchesListAdapter(activity!!)
+        recyclerView.adapter = launchesListAdapter
+
+        launchesListAdapter.listItemClickListener = { flightNumber ->
+            Toast.makeText(activity, "$flightNumber clicked!!!!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun observeData() {
         viewModel.getLaunchesLiveData().observe(this, Observer {
-            testView.text = it.toString()
+            launchesListAdapter.launches = it
         })
 
         viewModel.getProgressVisibilityData().observe(this, Observer { isProgress ->
@@ -80,8 +100,9 @@ class LaunchesListFragment : Fragment() {
             }
         })
 
-        viewModel.getLastUpdateTimeData().observe(this, Observer {
-            val lastUpdateStr = getString(R.string.launches_last_update_time_label, it.toString())
+        viewModel.getLastUpdateTimeData().observe(this, Observer { timestamp ->
+            val timeStr = lastUpdateDateFormat.format(Date(timestamp))
+            val lastUpdateStr = getString(R.string.launches_last_update_time_label, timeStr)
             lastUpdateTimeView.text = lastUpdateStr
         })
     }
