@@ -1,19 +1,19 @@
 package com.test.spacexlaunches.ui.details
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.test.spacexlaunches.data.SpaceXRepository
 import com.test.spacexlaunches.data.model.Launch
 import com.test.spacexlaunches.util.SingleLiveEvent
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
 import java.lang.Exception
+import java.net.URL
 import javax.inject.Inject
 
 /**
@@ -54,31 +54,60 @@ class DetailsViewModel @Inject constructor(
             )
     }
 
-    fun saveImageIntoStorage(bitmap: Bitmap, targetPath: String, fileName: String) {
-        Log.d(logTag, "saveImageIntoStorage(): targetPath=$targetPath, fileName=$fileName")
+    @SuppressLint("CheckResult")
+    fun downloadAndSaveImage(sourceUrl: String, targetPath: String) {
+        Log.d(logTag, "downloadAndSaveImage(): sourceUrl=$sourceUrl, targetPath=$targetPath")
+        downloadAndSave(sourceUrl, targetPath)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onComplete = {
+                Log.d(logTag, "downloadAndSaveImage success")
+                viewAction.value = SimpleViewAction.SHOW_SAVE_IMAGE_SUCCESS_MESSAGE
+            }, onError = {
+                Log.e(logTag, "downloadAndSaveImage error:${it}")
+                viewAction.value = SimpleViewAction.SHOW_SAVE_IMAGE_ERROR_MESSAGE
+            })
+    }
 
-        var fileOutputStream: FileOutputStream? = null
-        try {
+    private fun downloadAndSave(sourceUrl: String, targetPath: String): Completable {
+        return Completable.create { emitter ->
             val targetDir = File(targetPath)
-
             if (!targetDir.exists()) {
                 targetDir.mkdirs()
             }
+            val parts = sourceUrl.split("/")
+            val fileName = parts[parts.size - 1]
 
-            val file = File(targetDir, fileName)
+            val targetFile = File(targetDir, fileName)
 
-            fileOutputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
-        } catch (e: Exception) {
-            Log.e(logTag, "saveImageIntoStorage(): failed to save image: $e")
-            viewAction.value = SimpleViewAction.SHOW_SAVE_IMAGE_ERROR_MESSAGE
-        } finally {
-            fileOutputStream?.flush()
-            fileOutputStream?.close()
+            var inputStream: BufferedInputStream? = null
+            var outputStream: ByteArrayOutputStream? = null
+            var fileOutputStream: FileOutputStream? = null
+            try {
+                val url = URL(sourceUrl)
+                inputStream = BufferedInputStream(url.openStream())
+                outputStream = ByteArrayOutputStream()
+                inputStream.use { input ->
+                    outputStream.use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                val byteArray = outputStream.toByteArray()
+
+                fileOutputStream = FileOutputStream(targetFile)
+                fileOutputStream.write(byteArray)
+
+            } catch (e: Exception) {
+                emitter.onError(e)
+
+            } finally {
+                outputStream?.close()
+                inputStream?.close()
+                fileOutputStream?.close()
+            }
+
+            emitter.onComplete()
         }
-
-        Log.d(logTag, "saveImageIntoStorage() success")
-        viewAction.value = SimpleViewAction.SHOW_SAVE_IMAGE_SUCCESS_MESSAGE
     }
 
     enum class SimpleViewAction {

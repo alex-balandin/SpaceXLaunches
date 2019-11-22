@@ -2,8 +2,6 @@ package com.test.spacexlaunches.ui.details
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
@@ -19,11 +17,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import com.test.spacexlaunches.R
 import com.test.spacexlaunches.SpaceXLaunchesApp
 import com.test.spacexlaunches.data.model.Launch
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -87,13 +83,13 @@ class DetailsActivity : AppCompatActivity() {
 
         galleryAdapter.downloadIconClickListener = { url ->
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                val path =
+                val targetPath =
                     Environment.getExternalStorageDirectory().toString() + "/SpaceXLaunches" + "/${currentLaunch?.flightNumber.toString()}_${currentLaunch?.missionName}"
 
                 AlertDialog.Builder(this)
-                    .setMessage(getString(R.string.download_image_confirmation_question, path))
+                    .setMessage(getString(R.string.download_image_confirmation_question, targetPath))
                     .setPositiveButton(R.string.download) { _, _ ->
-                        downloadImage(url, path)
+                        viewModel.downloadAndSaveImage(url, targetPath)
                     }
                     .setNegativeButton(R.string.cancel) { dialogInterface, _ ->
                         dialogInterface.dismiss()
@@ -189,33 +185,5 @@ class DetailsActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this,
             arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
             permissionsRequestCode)
-    }
-
-    private fun downloadImage(url: String, targetPath: String) {
-        Picasso.get()
-            .load(url)
-            .into(object: Target {
-                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                }
-
-                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                    this@DetailsActivity.runOnUiThread {
-                        Toast.makeText(
-                            this@DetailsActivity,
-                            getString(R.string.failed_to_download_image_message),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-
-                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                    if (bitmap != null) {
-                        val parts = url.split("/")
-                        val fileName = parts[parts.size - 1]
-
-                        viewModel.saveImageIntoStorage(bitmap, targetPath, fileName)
-                    }
-                }
-            })
     }
 }
