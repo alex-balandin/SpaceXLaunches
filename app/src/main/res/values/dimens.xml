@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="details_screen_image_size">300dp</dimen>
-    <dimen name="details_screen_image_margins">3dp</dimen>
+    <dimen name="gallery_item_size">300dp</dimen>
+    <dimen name="gallery_item_margins">3dp</dimen>
+    <dimen name="gallery_download_icon_size">48dp</dimen>
+    <dimen name="gallery_download_icon_padding">10dp</dimen>
 </resources>

@@ -26,7 +26,7 @@ import javax.inject.Inject
 class LaunchesListFragment : Fragment() {
 
     private val lastUpdateDateFormat: SimpleDateFormat
-            = SimpleDateFormat("dd/MM/yyyy hh:mm:ss", Locale.ENGLISH)
+            = SimpleDateFormat("dd/MM/yyyy kk:mm:ss", Locale.ENGLISH)
 
     @Inject
     lateinit var launchesListViewModelFactory: LaunchesListViewModelFactory
@@ -111,6 +111,7 @@ class LaunchesListFragment : Fragment() {
         })
 
         viewModel.getViewAction().observe(this, Observer { action ->
+            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
             when (action) {
                 LaunchesListViewModel.SimpleViewAction.SHOW_NETWORK_ERROR_MESSAGE -> {
                     Toast.makeText(activity, getString(R.string.network_error_message), Toast.LENGTH_SHORT).show()

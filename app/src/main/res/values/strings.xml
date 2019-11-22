@@ -10,4 +10,10 @@
     <string name="launches_list_item_upcoming">Upcoming</string>
     <string name="launches_list_item_past">Past</string>
     <string name="network_error_message">Network error</string>
+    <string name="download_image_confirmation_question">Image will be saved to\n%s</string>
+    <string name="download">Download</string>
+    <string name="cancel">Cancel</string>
+    <string name="failed_to_download_image_message">Failed to download image</string>
+    <string name="failed_to_save_image_message">Failed to save image</string>
+    <string name="image_successfully_saved_message">Image successfully saved!</string>
 </resources>

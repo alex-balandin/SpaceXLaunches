@@ -1,19 +1,29 @@
 package com.test.spacexlaunches.ui.details
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.Gravity
+import android.os.Environment
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import com.test.spacexlaunches.R
 import com.test.spacexlaunches.SpaceXLaunchesApp
 import com.test.spacexlaunches.data.model.Launch
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -27,6 +37,8 @@ class DetailsActivity : AppCompatActivity() {
         const val flightNumberExtraKey = "flightNumberExtraKey"
     }
 
+    private val permissionsRequestCode = 123
+
     private val launchDateFormat: SimpleDateFormat
             = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
@@ -34,6 +46,7 @@ class DetailsActivity : AppCompatActivity() {
     lateinit var viewModelFactory: DetailsViewModelFactory
     private lateinit var viewModel: DetailsViewModel
 
+    private lateinit var progressBar: View
     private lateinit var logoView: ImageView
     private lateinit var flightNumberView: TextView
     private lateinit var missionNameView: TextView
@@ -41,7 +54,11 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var upcomingOrPastView: TextView
     private lateinit var detailsView: TextView
     private lateinit var articleLinkView: TextView
-    private lateinit var imagesContainer: LinearLayout
+
+    private lateinit var galleryRecyclerView: RecyclerView
+    private lateinit var galleryAdapter: GalleryAdapter
+
+    private var currentLaunch: Launch? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +69,7 @@ class DetailsActivity : AppCompatActivity() {
 
         val flightNumber = intent?.extras?.getInt(flightNumberExtraKey, -1) ?: -1
 
+        progressBar = findViewById(R.id.progress)
         logoView = findViewById(R.id.logo)
         flightNumberView = findViewById(R.id.flight_number)
         missionNameView = findViewById(R.id.mission_name)
@@ -59,7 +77,32 @@ class DetailsActivity : AppCompatActivity() {
         upcomingOrPastView = findViewById(R.id.is_upcoming)
         detailsView = findViewById(R.id.details)
         articleLinkView = findViewById(R.id.article_link)
-        imagesContainer = findViewById(R.id.images_container)
+
+        galleryRecyclerView = findViewById(R.id.gallery_recycler_view)
+        galleryRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        galleryAdapter = GalleryAdapter()
+        galleryRecyclerView.adapter = galleryAdapter
+
+        galleryAdapter.downloadIconClickListener = { url ->
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                val path =
+                    Environment.getExternalStorageDirectory().toString() + "/SpaceXLaunches" + "/${currentLaunch?.flightNumber.toString()}_${currentLaunch?.missionName}"
+
+                AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.download_image_confirmation_question, path))
+                    .setPositiveButton(R.string.download) { _, _ ->
+                        downloadImage(url, path)
+                    }
+                    .setNegativeButton(R.string.cancel) { dialogInterface, _ ->
+                        dialogInterface.dismiss()
+                    }
+                    .create().show()
+            } else {
+                requestStoragePermission()
+            }
+        }
 
         observeData()
         viewModel.onDetailsViewCreated(flightNumber)
@@ -71,11 +114,33 @@ class DetailsActivity : AppCompatActivity() {
         })
 
         viewModel.getProgressVisibilityData().observe(this, Observer {
+            progressBar.visibility = if (it) View.VISIBLE else View.GONE
+        })
 
+        viewModel.getViewAction().observe(this, Observer { action ->
+            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
+            when (action) {
+                DetailsViewModel.SimpleViewAction.SHOW_SAVE_IMAGE_SUCCESS_MESSAGE -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.image_successfully_saved_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                DetailsViewModel.SimpleViewAction.SHOW_SAVE_IMAGE_ERROR_MESSAGE -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.failed_to_save_image_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         })
     }
 
     private fun bindLaunchData(launch: Launch) {
+        currentLaunch = launch
+
         flightNumberView.text = getString(
             R.string.launches_list_item_flight_number, launch.flightNumber.toString())
         missionNameView.text = getString(
@@ -112,28 +177,45 @@ class DetailsActivity : AppCompatActivity() {
             articleLinkView.visibility = View.GONE
         }
 
-        //TODO implement gallery with recycler view:
         if (launch.flickrImages != null && launch.flickrImages.isNotEmpty()) {
-            for (imageLink in launch.flickrImages) {
-                val width = resources.getDimension(R.dimen.details_screen_image_size).toInt()
-                val height = resources.getDimension(R.dimen.details_screen_image_size).toInt()
-                val layoutParams = LinearLayout.LayoutParams(width, height)
-
-                val margin = resources.getDimension(R.dimen.details_screen_image_margins).toInt()
-                layoutParams.setMargins(margin, margin, margin, margin)
-                layoutParams.gravity = Gravity.CENTER
-
-                val imageView = ImageView(this)
-                imageView.layoutParams = layoutParams
-                imageView.setBackgroundColor(resources.getColor(android.R.color.darker_gray))
-
-                imagesContainer.addView(imageView)
-
-                Picasso.get()
-                    .load(imageLink)
-                    .placeholder(R.drawable.ic_launcher_foreground)
-                    .into(imageView)
-            }
+            galleryRecyclerView.visibility = View.VISIBLE
+            galleryAdapter.imageUrls = launch.flickrImages
+        } else {
+            galleryRecyclerView.visibility = View.GONE
         }
+    }
+
+    private fun requestStoragePermission() {
+        ActivityCompat.requestPermissions(this,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            permissionsRequestCode)
+    }
+
+    private fun downloadImage(url: String, targetPath: String) {
+        Picasso.get()
+            .load(url)
+            .into(object: Target {
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                }
+
+                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                    this@DetailsActivity.runOnUiThread {
+                        Toast.makeText(
+                            this@DetailsActivity,
+                            getString(R.string.failed_to_download_image_message),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                    if (bitmap != null) {
+                        val parts = url.split("/")
+                        val fileName = parts[parts.size - 1]
+
+                        viewModel.saveImageIntoStorage(bitmap, targetPath, fileName)
+                    }
+                }
+            })
     }
 }
