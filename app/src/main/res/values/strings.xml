@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">SpaceX Launches</string>
+    <string name="details_screen_name">Launch Details</string>
     <string name="launches_list_tab_title">Launches</string>
     <string name="launches_chart_tab_title">Statistics</string>
     <string name="launches_last_update_time_label">Last update: %s</string>
@@ -8,4 +9,5 @@
     <string name="launches_list_item_mission_name">Mission: %s</string>
     <string name="launches_list_item_upcoming">Upcoming</string>
     <string name="launches_list_item_past">Past</string>
+    <string name="network_error_message">Network error</string>
 </resources>

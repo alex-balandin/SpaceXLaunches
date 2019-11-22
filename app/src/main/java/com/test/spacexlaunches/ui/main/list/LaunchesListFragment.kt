@@ -1,10 +1,10 @@
 package com.test.spacexlaunches.ui.main.list
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -15,8 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.test.spacexlaunches.R
 import com.test.spacexlaunches.SpaceXLaunchesApp
-import com.test.spacexlaunches.ui.main.MainViewModel
-import com.test.spacexlaunches.ui.main.MainViewModelFactory
+import com.test.spacexlaunches.ui.details.DetailsActivity
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -30,22 +29,22 @@ class LaunchesListFragment : Fragment() {
             = SimpleDateFormat("dd/MM/yyyy hh:mm:ss", Locale.ENGLISH)
 
     @Inject
-    lateinit var mainViewModelFactory: MainViewModelFactory
-    lateinit var viewModel: MainViewModel
+    lateinit var launchesListViewModelFactory: LaunchesListViewModelFactory
+    private lateinit var viewModel: LaunchesListViewModel
 
-    lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    lateinit var progressBar: View
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var progressBar: View
 
-    lateinit var recyclerView: RecyclerView
-    lateinit var launchesListAdapter: LaunchesListAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var launchesListAdapter: LaunchesListAdapter
 
-    lateinit var lastUpdateTimeView: TextView
+    private lateinit var lastUpdateTimeView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         (activity!!.application as SpaceXLaunchesApp).appComponent.inject(this)
-        viewModel = ViewModelProviders.of(activity!!, mainViewModelFactory).get(MainViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, launchesListViewModelFactory).get(LaunchesListViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -63,7 +62,6 @@ class LaunchesListFragment : Fragment() {
         lastUpdateTimeView.text = getString(R.string.launches_last_update_time_label, "")
 
         observeData()
-        viewModel.onLaunchesListViewCreated()
 
         progressBar = view.findViewById(R.id.progress)
 
@@ -82,8 +80,14 @@ class LaunchesListFragment : Fragment() {
         recyclerView.adapter = launchesListAdapter
 
         launchesListAdapter.listItemClickListener = { flightNumber ->
-            Toast.makeText(activity, "$flightNumber clicked!!!!", Toast.LENGTH_SHORT).show()
+            viewModel.onClickedListItem(flightNumber)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onLaunchesListViewCreated()
+
     }
 
     private fun observeData() {
@@ -104,6 +108,20 @@ class LaunchesListFragment : Fragment() {
             val timeStr = lastUpdateDateFormat.format(Date(timestamp))
             val lastUpdateStr = getString(R.string.launches_last_update_time_label, timeStr)
             lastUpdateTimeView.text = lastUpdateStr
+        })
+
+        viewModel.getViewAction().observe(this, Observer { action ->
+            when (action) {
+                LaunchesListViewModel.SimpleViewAction.SHOW_NETWORK_ERROR_MESSAGE -> {
+                    Toast.makeText(activity, getString(R.string.network_error_message), Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+
+        viewModel.getStartDetailsScreenAction().observe(this, Observer { flightNumber ->
+            val intent = Intent(activity, DetailsActivity::class.java)
+            intent.putExtra(DetailsActivity.flightNumberExtraKey, flightNumber)
+            startActivity(intent)
         })
     }
 }

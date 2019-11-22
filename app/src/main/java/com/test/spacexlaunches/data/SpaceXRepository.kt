@@ -22,6 +22,11 @@ class SpaceXRepository @Inject constructor(
 
     fun getLaunchesUpdateTimestamp(): Long = sharedPrefsHelper.getLaunchesUpdateTimestamp()
 
+    fun getLaunchCached(flightNumber: Int): Single<Launch> {
+        Log.d(logTag, "getLaunchCached()")
+        return launchesDao.queryLaunch(flightNumber)
+    }
+
     fun getAllLaunches(forceUpdate: Boolean): Single<List<Launch>> {
         Log.d(logTag, "getAllLaunches()")
         return if (forceUpdate) {

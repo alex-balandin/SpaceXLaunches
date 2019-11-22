@@ -10,8 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.test.spacexlaunches.R
 import com.test.spacexlaunches.SpaceXLaunchesApp
-import com.test.spacexlaunches.ui.main.MainViewModel
-import com.test.spacexlaunches.ui.main.MainViewModelFactory
 import javax.inject.Inject
 
 /**
@@ -20,16 +18,16 @@ import javax.inject.Inject
 class ChartFragment : Fragment() {
 
     @Inject
-    lateinit var mainViewModelFactory: MainViewModelFactory
-    lateinit var viewModel: MainViewModel
+    lateinit var chartViewModelFactory: ChartViewModelFactory
+    private lateinit var viewModel: ChartViewModel
 
-    lateinit var testView: TextView
+    private lateinit var testView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         (activity!!.application as SpaceXLaunchesApp).appComponent.inject(this)
-        viewModel = ViewModelProviders.of(activity!!, mainViewModelFactory).get(MainViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, chartViewModelFactory).get(ChartViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -46,7 +44,11 @@ class ChartFragment : Fragment() {
         testView = view.findViewById(R.id.test_view)
 
         observeData()
-        viewModel.onLaunchesListViewCreated()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onChartViewCreated()
     }
 
     private fun observeData() {

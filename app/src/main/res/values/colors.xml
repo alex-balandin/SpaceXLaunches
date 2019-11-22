@@ -4,7 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="launches_list_item_bg">#ddd</color>
-    <color name="launches_list_item_bg_pressed">#ccc</color>
-    <color name="past_launch_colot">#ccc</color>
+    <color name="gray_light">#ddd</color>
+    <color name="gray_darker">#ccc</color>
 </resources>

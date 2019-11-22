@@ -53,10 +53,10 @@ class LaunchesListAdapter(private val context: Context) :
         }
 
         if (launch.upcoming) {
-            holder.isUpcomingView.text =  context.getString(R.string.launches_list_item_upcoming)
+            holder.isUpcomingView.text = context.getString(R.string.launches_list_item_upcoming)
             holder.isUpcomingView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_orange_light))
         } else {
-            holder.isUpcomingView.text =  context.getString(R.string.launches_list_item_past)
+            holder.isUpcomingView.text = context.getString(R.string.launches_list_item_past)
             holder.isUpcomingView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_light))
         }
 

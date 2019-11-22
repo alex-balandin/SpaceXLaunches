@@ -2,6 +2,7 @@ package com.test.spacexlaunches.di.component
 
 import com.test.spacexlaunches.di.module.ApiModule
 import com.test.spacexlaunches.di.module.AppModule
+import com.test.spacexlaunches.ui.details.DetailsActivity
 import com.test.spacexlaunches.ui.main.chart.ChartFragment
 import com.test.spacexlaunches.ui.main.list.LaunchesListFragment
 import dagger.Component
@@ -17,4 +18,6 @@ interface AppComponent {
     fun inject(launchesListFragment: LaunchesListFragment)
 
     fun inject(chartFragment: ChartFragment)
+
+    fun inject(detailsActivity: DetailsActivity)
 }
