@@ -17,4 +17,7 @@
     <string name="failed_to_download_image_message">Failed to download image</string>
     <string name="failed_to_save_image_message">Failed to save image</string>
     <string name="image_successfully_saved_message">Image successfully saved!</string>
+    <string name="statistics_screen_label">Number of launches by month</string>
+    <string name="single_launch_chart_hint">1 launch in %s</string>
+    <string name="multiple_launches_chart_hint">%d launches in %s</string>
 </resources>

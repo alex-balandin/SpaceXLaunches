@@ -1,10 +1,12 @@
 package com.test.spacexlaunches.ui.main.chart
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -47,7 +49,18 @@ class ChartFragment : Fragment() {
 
         chart = view.findViewById(R.id.chart)
         chart.chartItemClickListener = { chartItem ->
-            Toast.makeText(activity, "$chartItem", Toast.LENGTH_SHORT).show()
+            val message = if (chartItem.value == 1) {
+                getString(R.string.single_launch_chart_hint, chartItem.label)
+            } else {
+                getString(R.string.multiple_launches_chart_hint, chartItem.value, chartItem.label)
+            }
+
+            val hintView = layoutInflater.inflate(R.layout.v_chart_hint, null)
+            hintView.findViewById<TextView>(R.id.message).text = message
+
+            AlertDialog.Builder(activity, R.style.ChartDialogTheme)
+                .setView(hintView)
+                .show()
         }
 
         observeData()
@@ -59,19 +72,8 @@ class ChartFragment : Fragment() {
     }
 
     private fun observeData() {
-        viewModel.getLaunchesLiveData().observe(this, Observer {
-
-            val chartItems: List<Chart.ChartItem> = listOf(
-                Chart.ChartItem(1, "Jan 2019"),
-                Chart.ChartItem(0, "Feb 2019"),
-                Chart.ChartItem(5, "Mar 2019"),
-                Chart.ChartItem(1, "Apr 2019"),
-                Chart.ChartItem(2, "May 2019"),
-                Chart.ChartItem(0, "Jun 2019"),
-                Chart.ChartItem(1, "Jul 2019"),
-                Chart.ChartItem(3, "Aug 2019"),
-                Chart.ChartItem(1, "Sep 2019"))
-            chart.data = chartItems
+        viewModel.getChartItemsData().observe(this, Observer {
+            chart.data = it
         })
 
         viewModel.getProgressVisibilityData().observe(this, Observer {isVisible ->

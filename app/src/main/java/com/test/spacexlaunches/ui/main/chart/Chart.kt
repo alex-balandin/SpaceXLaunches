@@ -190,11 +190,6 @@ class Chart : RelativeLayout, View.OnTouchListener {
         }
     }
 
-    data class ChartItem(
-        val value: Int,
-        val label: String
-    )
-
     private data class ChartDrawItem(
         val chartItem: ChartItem,
         val labelX: Float,

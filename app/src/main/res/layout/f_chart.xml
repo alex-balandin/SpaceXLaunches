@@ -3,18 +3,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <HorizontalScrollView
-        android:id="@+id/horizontal_scroll"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:scrollbars="vertical">
 
-        <com.test.spacexlaunches.ui.main.chart.Chart
-            android:id="@+id/chart"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/chart_height"
-            android:background="@android:color/darker_gray"/>
-    </HorizontalScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp"
+                android:textSize="16sp"
+                android:text="@string/statistics_screen_label" />
+
+            <HorizontalScrollView
+                android:id="@+id/horizontal_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.test.spacexlaunches.ui.main.chart.Chart
+                    android:id="@+id/chart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/chart_height"
+                    android:background="@android:color/darker_gray"/>
+            </HorizontalScrollView>
+        </LinearLayout>
+    </ScrollView>
 
     <ProgressBar
         android:id="@+id/progress"
