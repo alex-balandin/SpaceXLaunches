@@ -3,17 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView
-        android:id="@+id/scrollView"
+    <HorizontalScrollView
+        android:id="@+id/horizontal_scroll"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_centerInParent="true"
-        android:background="@android:color/darker_gray">
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true">
 
-        <TextView
-            android:id="@+id/test_view"
+        <com.test.spacexlaunches.ui.main.chart.Chart
+            android:id="@+id/chart"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="chart"/>
-    </ScrollView>
+            android:layout_height="@dimen/chart_height"
+            android:background="@android:color/darker_gray"/>
+    </HorizontalScrollView>
 </RelativeLayout>

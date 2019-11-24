@@ -25,13 +25,13 @@ class ChartViewModel @Inject constructor(
     fun getLaunchesLiveData(): MutableLiveData<List<Launch>> = launchesLiveData
     fun getProgressVisibilityData(): MutableLiveData<Boolean> = progressVisibilityData
 
-    fun onChartViewCreated() = getLaunchesData(false)
+    fun onChartViewResumed() = getLaunchesData()
 
     @SuppressLint("CheckResult")
-    private fun getLaunchesData(forceUpdate: Boolean) {
-        Log.d(logTag, "getLaunchesData(), forceUpdate=${forceUpdate}")
+    private fun getLaunchesData() {
+        Log.d(logTag, "getLaunchesData()")
         progressVisibilityData.value = true
-        repository.getAllLaunches(forceUpdate)
+        repository.getAllLaunches(false)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

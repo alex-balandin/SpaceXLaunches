@@ -5,10 +5,11 @@
     <string name="launches_chart_tab_title">Statistics</string>
     <string name="launches_last_update_time_label">Last update: %s</string>
     <string name="launches_swipe_down_to_refresh">(swipe down to refresh data)</string>
-    <string name="launches_list_item_flight_number">Flight number: %s</string>
-    <string name="launches_list_item_mission_name">Mission: %s</string>
-    <string name="launches_list_item_upcoming">Upcoming</string>
-    <string name="launches_list_item_past">Past</string>
+    <string name="launch_flight_number">Flight number: %s</string>
+    <string name="launch_mission_name">Mission: %s</string>
+    <string name="launch_rocket_name">Rocket: %s</string>
+    <string name="launch_upcoming">Upcoming</string>
+    <string name="launch_past">Past</string>
     <string name="network_error_message">Network error</string>
     <string name="download_image_confirmation_question">Image will be saved to\n%s</string>
     <string name="download">Download</string>

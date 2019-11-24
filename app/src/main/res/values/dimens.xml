@@ -4,4 +4,11 @@
     <dimen name="gallery_item_margins">3dp</dimen>
     <dimen name="gallery_download_icon_size">48dp</dimen>
     <dimen name="gallery_download_icon_padding">10dp</dimen>
+
+    <dimen name="chart_height">200dp</dimen>
+    <dimen name="chart_padding">15dp</dimen>
+    <dimen name="chart_text_size">14sp</dimen>
+    <dimen name="chart_axis_line_width">2dp</dimen>
+    <dimen name="chart_item_padding">4dp</dimen>
+    <dimen name="chart_y_axis_label_padding">3dp</dimen>
 </resources>

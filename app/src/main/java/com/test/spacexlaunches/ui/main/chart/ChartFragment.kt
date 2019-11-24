@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -21,7 +22,7 @@ class ChartFragment : Fragment() {
     lateinit var chartViewModelFactory: ChartViewModelFactory
     private lateinit var viewModel: ChartViewModel
 
-    private lateinit var testView: TextView
+    private lateinit var chart: Chart
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,19 +42,33 @@ class ChartFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        testView = view.findViewById(R.id.test_view)
+        chart = view.findViewById(R.id.chart)
+        chart.chartItemClickListener = { chartItem ->
+            Toast.makeText(activity, "$chartItem", Toast.LENGTH_SHORT).show()
+        }
 
         observeData()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.onChartViewCreated()
+        viewModel.onChartViewResumed()
     }
 
     private fun observeData() {
         viewModel.getLaunchesLiveData().observe(this, Observer {
-            testView.text = it.toString()
+
+            val chartItems: List<Chart.ChartItem> = listOf(
+                Chart.ChartItem(1, "Jan 2019"),
+                Chart.ChartItem(0, "Feb 2019"),
+                Chart.ChartItem(5, "Mar 2019"),
+                Chart.ChartItem(1, "Apr 2019"),
+                Chart.ChartItem(2, "May 2019"),
+                Chart.ChartItem(0, "Jun 2019"),
+                Chart.ChartItem(1, "Jul 2019"),
+                Chart.ChartItem(3, "Aug 2019"),
+                Chart.ChartItem(1, "Sep 2019"))
+            chart.data = chartItems
         })
     }
 }

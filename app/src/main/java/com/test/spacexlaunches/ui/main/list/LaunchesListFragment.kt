@@ -82,12 +82,8 @@ class LaunchesListFragment : Fragment() {
         launchesListAdapter.listItemClickListener = { flightNumber ->
             viewModel.onClickedListItem(flightNumber)
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
         viewModel.onLaunchesListViewCreated()
-
     }
 
     private fun observeData() {

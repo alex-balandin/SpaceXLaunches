@@ -44,19 +44,19 @@ class LaunchesListAdapter(private val context: Context) :
     override fun onBindViewHolder(holder: LaunchesViewHolder, position: Int) {
         val launch = launches[position]
         holder.flightNumberView.text = context.getString(
-            R.string.launches_list_item_flight_number, launch.flightNumber.toString())
+            R.string.launch_flight_number, launch.flightNumber.toString())
         holder.missionNameView.text = context.getString(
-            R.string.launches_list_item_mission_name, launch.missionName)
+            R.string.launch_mission_name, launch.missionName)
 
         if (launch.launchDateUnix != null) {
             holder.dateView.text = launchDateFormat.format(Date(launch.launchDateUnix * 1000L))
         }
 
         if (launch.upcoming) {
-            holder.isUpcomingView.text = context.getString(R.string.launches_list_item_upcoming)
+            holder.isUpcomingView.text = context.getString(R.string.launch_upcoming)
             holder.isUpcomingView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_orange_light))
         } else {
-            holder.isUpcomingView.text = context.getString(R.string.launches_list_item_past)
+            holder.isUpcomingView.text = context.getString(R.string.launch_past)
             holder.isUpcomingView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_light))
         }
 

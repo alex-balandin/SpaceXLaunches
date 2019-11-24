@@ -46,6 +46,7 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var logoView: ImageView
     private lateinit var flightNumberView: TextView
     private lateinit var missionNameView: TextView
+    private lateinit var rocketNameView: TextView
     private lateinit var dateView: TextView
     private lateinit var upcomingOrPastView: TextView
     private lateinit var detailsView: TextView
@@ -69,6 +70,7 @@ class DetailsActivity : AppCompatActivity() {
         logoView = findViewById(R.id.logo)
         flightNumberView = findViewById(R.id.flight_number)
         missionNameView = findViewById(R.id.mission_name)
+        rocketNameView = findViewById(R.id.rocket_name)
         dateView = findViewById(R.id.date)
         upcomingOrPastView = findViewById(R.id.is_upcoming)
         detailsView = findViewById(R.id.details)
@@ -138,19 +140,21 @@ class DetailsActivity : AppCompatActivity() {
         currentLaunch = launch
 
         flightNumberView.text = getString(
-            R.string.launches_list_item_flight_number, launch.flightNumber.toString())
+            R.string.launch_flight_number, launch.flightNumber.toString())
         missionNameView.text = getString(
-            R.string.launches_list_item_mission_name, launch.missionName)
+            R.string.launch_mission_name, launch.missionName)
+        rocketNameView.text = getString(
+            R.string.launch_rocket_name, launch.rocketName)
 
         if (launch.launchDateUnix != null) {
             dateView.text = launchDateFormat.format(Date(launch.launchDateUnix * 1000L))
         }
 
         if (launch.upcoming) {
-            upcomingOrPastView.text = getString(R.string.launches_list_item_upcoming)
+            upcomingOrPastView.text = getString(R.string.launch_upcoming)
             upcomingOrPastView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
         } else {
-            upcomingOrPastView.text = getString(R.string.launches_list_item_past)
+            upcomingOrPastView.text = getString(R.string.launch_past)
             upcomingOrPastView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
         }
 
