@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,6 +23,7 @@ class ChartFragment : Fragment() {
     private lateinit var viewModel: ChartViewModel
 
     private lateinit var chart: Chart
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,8 @@ class ChartFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        progressBar = view.findViewById(R.id.progress)
 
         chart = view.findViewById(R.id.chart)
         chart.chartItemClickListener = { chartItem ->
@@ -69,6 +72,14 @@ class ChartFragment : Fragment() {
                 Chart.ChartItem(3, "Aug 2019"),
                 Chart.ChartItem(1, "Sep 2019"))
             chart.data = chartItems
+        })
+
+        viewModel.getProgressVisibilityData().observe(this, Observer {isVisible ->
+            if (isVisible) {
+                progressBar.visibility = View.VISIBLE
+            } else {
+                progressBar.visibility = View.GONE
+            }
         })
     }
 }

@@ -36,7 +36,7 @@ class GalleryAdapter : RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() 
 
         Picasso.get()
             .load(url)
-            .placeholder(R.drawable.ic_launcher_foreground)
+            .placeholder(R.drawable.images_placeholder)
             .into(holder.image)
 
         holder.downloadIcon.setOnClickListener {

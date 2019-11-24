@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@color/launches_list_item_bg_selector"
+    android:background="@drawable/launches_list_item_bg_selector"
     android:padding="8dp"
     android:layout_margin="5dp"
     android:gravity="center_vertical">

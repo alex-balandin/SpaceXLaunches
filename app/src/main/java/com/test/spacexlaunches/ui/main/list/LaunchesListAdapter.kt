@@ -62,7 +62,7 @@ class LaunchesListAdapter(private val context: Context) :
 
         Picasso.get()
             .load(launch.missionPatchSmall)
-            .placeholder(R.drawable.ic_launcher_foreground)
+            .placeholder(R.drawable.images_placeholder)
             .into(holder.logo)
 
         holder.itemView.setOnClickListener {

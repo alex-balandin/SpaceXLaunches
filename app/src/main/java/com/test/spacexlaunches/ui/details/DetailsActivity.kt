@@ -160,7 +160,7 @@ class DetailsActivity : AppCompatActivity() {
 
         Picasso.get()
             .load(launch.missionPatchSmall)
-            .placeholder(R.drawable.ic_launcher_foreground)
+            .placeholder(R.drawable.images_placeholder)
             .into(logoView)
 
         if (launch.details != null) {
