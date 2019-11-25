@@ -72,11 +72,11 @@ class ChartFragment : Fragment() {
     }
 
     private fun observeData() {
-        viewModel.getChartItemsData().observe(this, Observer {
+        viewModel.chartItemsLiveData.observe(this, Observer {
             chart.data = it
         })
 
-        viewModel.getProgressVisibilityData().observe(this, Observer {isVisible ->
+        viewModel.progressVisibilityData.observe(this, Observer {isVisible ->
             if (isVisible) {
                 progressBar.visibility = View.VISIBLE
             } else {

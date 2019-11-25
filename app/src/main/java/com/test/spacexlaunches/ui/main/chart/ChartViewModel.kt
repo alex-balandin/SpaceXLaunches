@@ -1,11 +1,11 @@
 package com.test.spacexlaunches.ui.main.chart
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.test.spacexlaunches.data.SpaceXRepository
 import com.test.spacexlaunches.data.model.Launch
+import com.test.spacexlaunches.util.Logger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -17,42 +17,40 @@ import javax.inject.Inject
  * Created by alex-balandin on 2019-11-21
  */
 class ChartViewModel @Inject constructor(
-    private val repository: SpaceXRepository
+    private val repository: SpaceXRepository,
+    private val logger: Logger
 ) : ViewModel() {
     private val logTag = "ChartViewModel"
 
     private val chartDateFormat: SimpleDateFormat
             = SimpleDateFormat("MMM yyyy", Locale.ENGLISH)
 
-    private val chartItemsLiveData: MutableLiveData<List<ChartItem>> = MutableLiveData()
-    private val progressVisibilityData: MutableLiveData<Boolean> = MutableLiveData()
-
-    fun getChartItemsData(): MutableLiveData<List<ChartItem>> = chartItemsLiveData
-    fun getProgressVisibilityData(): MutableLiveData<Boolean> = progressVisibilityData
+    val chartItemsLiveData: MutableLiveData<List<ChartItem>> = MutableLiveData()
+    val progressVisibilityData: MutableLiveData<Boolean> = MutableLiveData()
 
     fun onChartViewResumed() = getLaunchesData()
 
     @SuppressLint("CheckResult")
     private fun getLaunchesData() {
-        Log.d(logTag, "getLaunchesData()")
+        logger.debug(logTag, "getLaunchesData()")
         progressVisibilityData.value = true
         repository.getAllLaunches(false)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    Log.d(logTag, "getAllLaunches success")
+                    logger.debug(logTag, "getAllLaunches success")
                     progressVisibilityData.value = false
                     chartItemsLiveData.value = buildChartItems(it)
                 },
                 onError = {
-                    Log.e(logTag, "getAllLaunches error:${it}")
+                    logger.error(logTag, "getAllLaunches error:${it}")
                     progressVisibilityData.value = false
                 })
     }
 
     private fun buildChartItems(launches: List<Launch>): List<ChartItem> {
-        var launchCalendars: MutableList<Calendar> = mutableListOf()
+        val launchCalendars: MutableList<Calendar> = mutableListOf()
 
         var startDateUnix: Long = Long.MAX_VALUE
         for (launch in launches) {

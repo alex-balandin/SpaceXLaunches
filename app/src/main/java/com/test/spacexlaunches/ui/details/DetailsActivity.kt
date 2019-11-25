@@ -107,15 +107,15 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     private fun observeData() {
-        viewModel.getLaunchLiveData().observe(this, Observer {
+        viewModel.launchLiveData.observe(this, Observer {
             bindLaunchData(it)
         })
 
-        viewModel.getProgressVisibilityData().observe(this, Observer {
+        viewModel.progressVisibilityData.observe(this, Observer {
             progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
 
-        viewModel.getViewAction().observe(this, Observer { action ->
+        viewModel.viewAction.observe(this, Observer { action ->
             @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
             when (action) {
                 DetailsViewModel.SimpleViewAction.SHOW_SAVE_IMAGE_SUCCESS_MESSAGE -> {
@@ -129,6 +129,13 @@ class DetailsActivity : AppCompatActivity() {
                     Toast.makeText(
                         this,
                         getString(R.string.failed_to_save_image_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                DetailsViewModel.SimpleViewAction.SHOW_GET_DATA_ERROR_MESSAGE -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.failed_to_get_data_message),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

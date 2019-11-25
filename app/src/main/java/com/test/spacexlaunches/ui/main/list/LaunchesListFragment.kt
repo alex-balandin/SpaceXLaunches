@@ -87,11 +87,11 @@ class LaunchesListFragment : Fragment() {
     }
 
     private fun observeData() {
-        viewModel.getLaunchesLiveData().observe(this, Observer {
+        viewModel.launchesLiveData.observe(this, Observer {
             launchesListAdapter.launches = it
         })
 
-        viewModel.getProgressVisibilityData().observe(this, Observer { isProgress ->
+        viewModel.progressVisibilityData.observe(this, Observer { isProgress ->
             if (isProgress && !swipeRefreshLayout.isRefreshing) {
                 progressBar.visibility = View.VISIBLE
             } else if (!isProgress) {
@@ -100,13 +100,13 @@ class LaunchesListFragment : Fragment() {
             }
         })
 
-        viewModel.getLastUpdateTimeData().observe(this, Observer { timestamp ->
+        viewModel.lastUpdateTimeData.observe(this, Observer { timestamp ->
             val timeStr = lastUpdateDateFormat.format(Date(timestamp))
             val lastUpdateStr = getString(R.string.launches_last_update_time_label, timeStr)
             lastUpdateTimeView.text = lastUpdateStr
         })
 
-        viewModel.getViewAction().observe(this, Observer { action ->
+        viewModel.viewAction.observe(this, Observer { action ->
             @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
             when (action) {
                 LaunchesListViewModel.SimpleViewAction.SHOW_NETWORK_ERROR_MESSAGE -> {
@@ -115,7 +115,7 @@ class LaunchesListFragment : Fragment() {
             }
         })
 
-        viewModel.getStartDetailsScreenAction().observe(this, Observer { flightNumber ->
+        viewModel.startDetailsScreenAction.observe(this, Observer { flightNumber ->
             val intent = Intent(activity, DetailsActivity::class.java)
             intent.putExtra(DetailsActivity.flightNumberExtraKey, flightNumber)
             startActivity(intent)

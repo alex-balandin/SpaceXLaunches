@@ -1,11 +1,11 @@
 package com.test.spacexlaunches.ui.main.list
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.test.spacexlaunches.data.SpaceXRepository
 import com.test.spacexlaunches.data.model.Launch
+import com.test.spacexlaunches.util.Logger
 import com.test.spacexlaunches.util.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -16,21 +16,16 @@ import javax.inject.Inject
  * Created by alex-balandin on 2019-11-21
  */
 class LaunchesListViewModel @Inject constructor(
-    private val repository: SpaceXRepository
+    private val repository: SpaceXRepository,
+    private val logger: Logger
 ) : ViewModel() {
     private val logTag = "LaunchesListViewModel"
 
-    private val launchesLiveData: MutableLiveData<List<Launch>> = MutableLiveData()
-    private val lastUpdateTimeData: MutableLiveData<Long> = MutableLiveData()
-    private val progressVisibilityData: MutableLiveData<Boolean> = MutableLiveData()
-    private val viewAction: SingleLiveEvent<SimpleViewAction> = SingleLiveEvent()
-    private val startDetailsScreenAction: SingleLiveEvent<Int> = SingleLiveEvent()
-
-    fun getLaunchesLiveData(): MutableLiveData<List<Launch>> = launchesLiveData
-    fun getLastUpdateTimeData(): MutableLiveData<Long> = lastUpdateTimeData
-    fun getProgressVisibilityData(): MutableLiveData<Boolean> = progressVisibilityData
-    fun getViewAction() : SingleLiveEvent<SimpleViewAction> = viewAction
-    fun getStartDetailsScreenAction() : SingleLiveEvent<Int> = startDetailsScreenAction
+    val launchesLiveData: MutableLiveData<List<Launch>> = MutableLiveData()
+    val lastUpdateTimeData: MutableLiveData<Long> = MutableLiveData()
+    var progressVisibilityData: MutableLiveData<Boolean> = MutableLiveData()
+    val viewAction: SingleLiveEvent<SimpleViewAction> = SingleLiveEvent()
+    val startDetailsScreenAction: SingleLiveEvent<Int> = SingleLiveEvent()
 
     fun onLaunchesListViewCreated() = getLaunchesData(false)
 
@@ -42,20 +37,20 @@ class LaunchesListViewModel @Inject constructor(
 
     @SuppressLint("CheckResult")
     private fun getLaunchesData(forceUpdate: Boolean) {
-        Log.d(logTag, "getLaunchesData(), forceUpdate=${forceUpdate}")
+        logger.debug(logTag, "getLaunchesData(), forceUpdate=${forceUpdate}")
         progressVisibilityData.value = true
         repository.getAllLaunches(forceUpdate)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    Log.d(logTag, "getAllLaunches success")
+                    logger.debug(logTag, "getAllLaunches success")
                     progressVisibilityData.value = false
                     launchesLiveData.value = it
                     lastUpdateTimeData.value = repository.getLaunchesUpdateTimestamp()
                 },
                 onError = {
-                    Log.e(logTag, "getAllLaunches error:${it}")
+                    logger.error(logTag, "getAllLaunches error:${it}")
                     progressVisibilityData.value = false
                     viewAction.value = SimpleViewAction.SHOW_NETWORK_ERROR_MESSAGE
                 })
